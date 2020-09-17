@@ -9,7 +9,7 @@ from Global_Vars import mean as mn
 from Global_Vars import std 
 import numpy as np
 import matplotlib.pyplot as plt 
-from sklearn.metrics import r2_score
+#from sklearn.metrics import r2_score
 
 # repeat for each file in list
 # from netCDF4 import Dataset
@@ -60,7 +60,7 @@ for file in [
         predict=np.poly1d(Linear_Regression)
         #slope of regression is lin_reg[0], y intercept is lin_reg[1]
         #R2+score is the accuracy of the linear fit
-        r2_score=r2_score(y, predict(x))
+        #r2_score=r2_score(y, predict(x))
         x_lin_reg = range(int(year[0]), int(year[len(year)-1]))
         y_lin_reg = predict(x_lin_reg)
         #Plot the linear regression

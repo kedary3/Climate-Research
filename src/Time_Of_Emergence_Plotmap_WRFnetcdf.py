@@ -56,7 +56,7 @@ def main():
     # draw plot
     
     plt.figure(figsize=(15,10))
-    WRFplot(plotvar,lats,lons, Ymin,Ymax, "Time_of_Emergence", "ToE in years", "RdYlBu_r")
+    WRFplot(plotvar,lats,lons, Ymin,Ymax, "Time_of_Emergence", "ToE in years", "RdYlBu")
     plt.show()
     plt.savefig("Time Of Emergence")
 

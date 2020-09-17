@@ -96,17 +96,26 @@ import pylab as lb
 if(Data_set2.variables.__str__().find("Standard_Deviation_Plus_Mean")==-1):
     stdhigh = Data_set2.createVariable("Standard_Deviation_Plus_Mean", "float32" , ("south_north","west_east",))
     stdhigh.units = "Unkown"
-    
+if(Data_set2.variables.__str__().find("Standard_Deviations")==-1):
+    std = Data_set2.createVariable("Standard_Deviations", "float32" , ("south_north","west_east",))
+    std.units = "degrees C"
+if(Data_set2.variables.__str__().find("Means")==-1):
+    mean = Data_set2.createVariable("Means", "float32" , ("south_north","west_east",))
+    mean.units = "degrees C"    
 
-    #iterate throught the grid points
-    stdhighs=Data_set2.variables["Standard_Deviation_Plus_Mean"]
-    for k in range(ny):
-        for i in range(nx):
-            #find the mean and standard deviations
-            Standard_Deviation=np.std(t90[:,[k],[i]])
-            mn=np.mean(t90[:,[k],[i]])
-            #get mean plus std and record it in file
-            stdhighs[[k],[i]]=Standard_Deviation+mn
+#iterate throught the grid points
+stdhighs =Data_set2.variables["Standard_Deviation_Plus_Mean"]
+stds     =Data_set2.variables["Standard_Deviations"]
+means    =Data_set2.variables["Means"]
+for k in range(ny):
+    for i in range(nx):
+        #find the mean and standard deviations
+        Standard_Deviation=np.std(t90[:,[k],[i]])
+        mn=np.mean(t90[:,[k],[i]])
+        #get mean plus std and record it in file
+        means[[k],[i]]=mn
+        stds[[k],[i]]=Standard_Deviation
+        stdhighs[[k],[i]]=Standard_Deviation+mn
 #close file
 Data_set2.close()
 def clone(src_file, trg_file): #function to copy attributes, variables, and dimensions from one NETCDF to another
@@ -162,8 +171,27 @@ for k in range(ny):
             ToEs[[k],[i]] = Time_of_Emergence
         
 ds.close()
+
+#add ToE data to model netcdf if needed
+dsm=Dataset("ccsm4_2006-2099_TX90th.nc","r+",format="NETCDF4")
+dst=Dataset("Time_of_Emergence.nc", "r",format="NETCDF4")
+
+if(dsm.variables.__str__().find("ToE")==-1):
+    ToE = dsm.createVariable("ToE", "float32" , ("south_north","west_east",))
+    ToE.units = "years"   
+    ToEs=dsm.variables["ToE"]
+    ToEs2=dst.variables["ToE"]
+    #fill in the data to the model ToE variable
+    for k in range(ny):
+        for i in range(nx):
+            ToEs[[k],[i]]=ToEs2[[k],[i]]  
+dsm.close()
+dst.close()
 # #to dos
-#     #calculate the ToE of Net_cdf at every grid point
-#     #visualize ToE at every grid point with basemap library
+#     # -|plot of two extremes to demonstrate two different toEs and add labels
+#     # -|time of emergence nc create std and mn variables
+#     # -|add variables to model netcdf
+      # -|add metadata to variable names of time of emergence
+
 
 
