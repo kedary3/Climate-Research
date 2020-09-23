@@ -119,3 +119,7 @@ def findLowToE(fl):
     return Low_Location
 #execute 
 main()
+#to does
+# move labels to outside graph
+# look at new data to try dynamic code
+# 

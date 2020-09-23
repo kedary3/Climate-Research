@@ -191,7 +191,7 @@ dst.close()
 #     # -|plot of two extremes to demonstrate two different toEs and add labels
 #     # -|time of emergence nc create std and mn variables
 #     # -|add variables to model netcdf
-      # -|add metadata to variable names of time of emergence
+      # add metadata to variable names of time of emergence
 
 
 
