@@ -26,17 +26,17 @@ from numpy import *
 from scipy.interpolate import interp2d
 import matplotlib.pyplot as plt
 
-data=Dataset("Netcdf_Files/Newest data sets (10,7,2020)/CCSM4_1970-2099_prextr.nc", "r", format="NETCDF4")
+data=Dataset("Netcdf_Files/CCSM4_1970-2099_prextr.nc", "r", format="NETCDF4")
 pr95=data.variables["pr95"][:] 
 # Here use x as lon and y as lat and Z as data field from GCM
-x = linspace(0, 50, 33)
-y=linspace(0,21,21)
+x = linspace(0, 1, 33)
+y=linspace(0,1,21)
 Z = pr95[0,:,:]
 
 # here X2 and Y2 (upper case) are lon and lat from WRF grid.nc
 # note that lat and lon are 2d arrays 
-x2 = linspace(0, 50, 123)
-y2 = linspace(0, 21, 162)
+x2 = linspace(0, 1, 123)
+y2 = linspace(0, 1, 162)
 X2,Y2 = meshgrid(x2,y2) # from grid.nc
 
 f = interp2d(x, y, Z, kind='cubic')
@@ -52,8 +52,8 @@ for i in arange(X2.shape[0]):
 X, Y = meshgrid(x, y)
 
 fig, ax = plt.subplots(nrows=1, ncols=2)
-ax[0].pcolormesh(X, Y, Z)
+ax[0].pcolormesh(X, Y, Z, shading="auto")
 
-ax[1].pcolormesh(X2, Y2, Z2)
+ax[1].pcolormesh(X2, Y2, Z2, shading="gouraud")
 
 plt.show()
