@@ -1,17 +1,11 @@
-#!/usr/bin/env python3
+#!/opt/local/bin/python3
 # -*- coding: utf-8 -*-
 """
-@author: esalathe
+Created on Thu Oct  1 17:49:02 2020
 
-New version of code to plot a map with WRF data
-This uses pcolormesh which is a lot faster than the contour routine and give a better image
+@author: salathe
 """
 
-
-from numpy import (
-        linspace,array, log,exp,sin,cos,sqrt, pi,e, 
-        zeros, ones, amin,amax, argmax, arange
-        )
 from matplotlib.pyplot import plot, show
 
 import numpy as np
@@ -21,49 +15,13 @@ from matplotlib.cm import get_cmap
 import cartopy
 import cartopy.crs as crs
 from cartopy.feature import NaturalEarthFeature
+import pylab as lb
+from netCDF4 import Dataset
+import pylab as lb
+from numpy import *
+from scipy.interpolate import interp2d
+import matplotlib.pyplot as plt
 
-"""
-This is one option for structuring python code
-Define a main() module that does the actual work.
-This is defined here, but isn't run until the bottom
-of the script file.
-"""
-
-def main():
-    # open netcdf file
-    #ncGridFile = Dataset("grid_d02.nc", "r", format="NETCDF4")
-    from netCDF4 import Dataset
-
-    ncFile = Dataset("Netcdf_Files/ccsm4-wrf_1970-2099_T2MAXextr.nc",
-                           "r", format="NETCDF4")
-        
-    # get the data to plot
-    T90=ncFile.variables["T2MAX90"][:]
-    lats = ncFile.variables["XLAT"][:]
-    lons = ncFile.variables["XLONG"][:]
-    
-    
-    # set variable specific options
-    plotvar=T90[0,:,:]-273.15
-    ## min=round(amin(plotvar)/5)*5+5
-    ## max=round(amax(plotvar)/5)*5+5
-    Tmin=10
-    Tmax=40
-    
-    # draw plot
-    
-    plt.figure(figsize=(15,10))
-    WRFplot(plotvar,lats,lons, Tmin,Tmax, "CCSM4-WRF 1970-2006", "T90 in °C", "RdYlBu_r")
-    plt.show()
-
-"""
-After main() define subroutines that are called by main()
-
-Structuring it this way helps to keep the variable namespace
-distinct between all the parts of the code
-"""
-    
-# Plotting Routine
 
 def WRFplot(plotvar,lats,lons,  vmin,vmax, title,varname, ColMap):
     # Set the cartopy mapping object for the WRF domain
@@ -111,13 +69,52 @@ def WRFplot(plotvar,lats,lons,  vmin,vmax, title,varname, ColMap):
     plt.title(title)
 
 
-"""
-Once everything is defined, execute it
-other script commands can be included here
-for example handing errors, inputs, global
-variables, etc
-"""
-    
-# Execute
-main()
+
+data=Dataset("Netcdf_Files/CCSM4_1970-2099_prextr.nc", "r", format="NETCDF4")
+pr95=data.variables["pr95"][:] * 24*60*60 # mm/day
+lon=data.variables["lon"][:] - 360
+lat=data.variables["lat"][:] 
+
+# Here use x as lon and y as lat and Z as data field from GCM
+x = lon
+y = lat
+Z = pr95[0,:,:]
+
+# here X2 and Y2 (upper case) are lon and lat from WRF grid.nc
+# note that lat and lon are 2d arrays 
+#x2 = linspace(0, 1, 123)
+#y2 = linspace(0, 1, 162)
+#X2,Y2 = meshgrid(x2,y2) # from grid.nc
+
+wdata=Dataset("Netcdf_Files/wrf_grid.nc", "r", format="NETCDF4")
+wrf_lon=wdata.variables["XLONG"][:] 
+wrf_lat=wdata.variables["XLAT"][:] 
+
+
+wrf_interp = interp2d(lon, lat, pr95[0,:,:], kind='cubic')
+
+# Since X2 and Y2 are 2-d arrays for irregular grid need to do point by point
+#    **THERE MAY BE A BETTER WAY?
+wrf_pr=zeros_like(wrf_lon)
+for i in arange(wrf_lon.shape[0]):
+    for j in arange(wrf_lon.shape[1]):
+        wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
+
+# plot coarse and fine grids
+LON, LAT = meshgrid(lon,lat)
+
+# fig, ax = plt.subplots(nrows=1, ncols=2)
+# ax[0].pcolormesh(LON,LAT,pr95[0,:,:], shading="auto")
+
+# ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
+
+
+plt.figure(figsize=(15,10))
+WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), "CCSM4 1970-2006", "PR max in mm/day", "RdYlBu_r")
+plt.show()
+
+
+plt.show()
+
+
 
