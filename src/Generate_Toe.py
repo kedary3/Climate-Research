@@ -5,6 +5,14 @@ Created on Wed Oct  7 12:35:10 2020
 @author: Kedar Yadav
 """
 
+#to dos
+	#do not use prn
+	#investigate negative years inaccuracy
+	#use 24*60*60 for mm/day for both wrf and gcm
+	#Delta toe for access and ccsm4 between wrf and gcm for temp and try prec
+		#all combinations
+
+
 from numpy import (
         linspace,array, log,exp,sin,cos,sqrt, pi,e, 
         zeros, ones, amin,amax, argmax, arange, shape
