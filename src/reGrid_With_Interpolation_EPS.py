@@ -6,6 +6,13 @@ Created on Thu Oct  1 17:49:02 2020
 @author: salathe
 """
 
+#to dos
+    # make the interpolation x,y,x2,y2 be dynamic data.variables[lat][:]
+    # make the interpolation a method call and populate interpolated toe data into gcm files
+    # boundary will be fixed
+    # try to make a toe delta graph (wrf-gcm)
+    # find extremes for different variables 
+
 from matplotlib.pyplot import plot, show
 
 import numpy as np
@@ -103,10 +110,10 @@ for i in arange(wrf_lon.shape[0]):
 # plot coarse and fine grids
 LON, LAT = meshgrid(lon,lat)
 
-# fig, ax = plt.subplots(nrows=1, ncols=2)
-# ax[0].pcolormesh(LON,LAT,pr95[0,:,:], shading="auto")
+fig, ax = plt.subplots(nrows=1, ncols=2)
+ax[0].pcolormesh(LON,LAT,[0,:,:], shading="auto")
 
-# ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
+ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
 
 
 plt.figure(figsize=(15,10))

@@ -35,6 +35,8 @@ Z = pr95[0,:,:]
 
 # here X2 and Y2 (upper case) are lon and lat from WRF grid.nc
 # note that lat and lon are 2d arrays 
+
+
 x2 = linspace(0, 1, 123)
 y2 = linspace(0, 1, 162)
 X2,Y2 = meshgrid(x2,y2) # from grid.nc
