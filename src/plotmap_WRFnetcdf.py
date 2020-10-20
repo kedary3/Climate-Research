@@ -34,11 +34,11 @@ def main():
     #ncGridFile = Dataset("grid_d02.nc", "r", format="NETCDF4")
     from netCDF4 import Dataset
 
-    ncFile = Dataset("ccsm4_1970-2006_TX90th.nc",
+    ncFile = Dataset("Netcdf_Files/ccsm4-wrf_1970-2099_T2MAXextr.nc",
                            "r", format="NETCDF4")
         
     # get the data to plot
-    T90=ncFile.variables["T90"][:]
+    T90=ncFile.variables["T2MAX90"][:]
     lats = ncFile.variables["XLAT"][:]
     lons = ncFile.variables["XLONG"][:]
     
