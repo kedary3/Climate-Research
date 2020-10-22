@@ -6,6 +6,14 @@ Created on Thu Oct  1 17:49:02 2020
 @author: salathe
 """
 
+####
+
+#to dos
+    # make the interpolation x,y,x2,y2 be dynamic data.variables[lat][:]
+    # make the interpolation a method call and populate interpolated toe data into gcm files 
+    # boundary will be fixed 
+    # try to make a toe delta graph (wrf-gcm)
+    # find extremes for different variavbles 
 from numpy import (
         linspace,array, log,exp,sin,cos,sqrt, pi,e, 
         zeros, ones, amin,amax, argmax, arange, shape
@@ -30,7 +38,7 @@ data=Dataset("Netcdf_Files/CCSM4_1970-2099_prextr.nc", "r", format="NETCDF4")
 pr95=data.variables["pr95"][:] 
 # Here use x as lon and y as lat and Z as data field from GCM
 x = linspace(0, 1, 33)
-y=linspace(0,1,21)
+y = linspace(0,1,21)
 Z = pr95[0,:,:]
 
 # here X2 and Y2 (upper case) are lon and lat from WRF grid.nc

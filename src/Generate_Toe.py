@@ -6,11 +6,19 @@ Created on Wed Oct  7 12:35:10 2020
 """
 
 #to dos
+<<<<<<< HEAD
     #do not use prn
     #investigate negative years inaccuracy
     #use 24*60*60 for mm/day for both wrf and gcm
     #Delta toe for access and ccsm4 between wrf and gcm for temp and try prec
     #all combinations
+=======
+	#do not use prn
+	#investigate negative years inaccuracy
+	#use 24*60*60 for mm/day for both wrf and gcm
+	#Delta toe for access and ccsm4 between wrf and gcm for temp and try prec
+		#all combinations
+>>>>>>> 7d285d17bba9b0c614ba17e96a2fc7857d4ca227
 
 
 from numpy import (
