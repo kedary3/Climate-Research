@@ -5,6 +5,14 @@ Created on Wed Oct  7 12:35:10 2020
 @author: Kedar Yadav
 """
 
+#to dos
+    #do not use prn
+    #investigate negative years inaccuracy
+    #use 24*60*60 for mm/day for both wrf and gcm
+    #Delta toe for access and ccsm4 between wrf and gcm for temp and try prec
+    #all combinations
+
+
 from numpy import (
         linspace,array, log,exp,sin,cos,sqrt, pi,e, 
         zeros, ones, amin,amax, argmax, arange, shape
@@ -120,18 +128,8 @@ def generate_WRF_TASMAX_ToE_Data(file, Temperature_Type):
                 ToEs[[k],[i]]=3000
             else:
                 #calculate ToE
-                if(slope<0):
-                    Time_of_Emergence = (Standard_Deviation-mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
-                else:
-                    Time_of_Emergence = (Standard_Deviation+mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
+                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                ToEs[[k],[i]] = Time_of_Emergence
             
     lb.title(Temperature_Type)
     lb.ylabel("Tmax (deg-C)")
@@ -235,18 +233,8 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
                 ToEs[[k],[i]]=3000
             else:
                 #calculate ToE
-                if(slope<0):
-                    Time_of_Emergence = (Standard_Deviation-mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
-                else:
-                    Time_of_Emergence = (Standard_Deviation+mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
+                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                ToEs[[k],[i]] = Time_of_Emergence
             
     lb.title(Temperature_Type)
     lb.ylabel("Tmax (deg-C)")
@@ -269,7 +257,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
     
         
     # get the data to plot
-    PREC=ncFile.variables[Precipitation_Type][:]
+    PREC=ncFile.variables[Precipitation_Type][:]*24*60*60 # mm/day
     lats = ncFile.variables["lat"][:]
     lons = ncFile.variables["lon"][:]
     
@@ -350,19 +338,9 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
             if(slope == 0):
                 ToEs[[k],[i]]=3000
             else:
-                #calculate ToE
-                if(slope<0):
-                    Time_of_Emergence = (Standard_Deviation-mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
-                else:
-                    Time_of_Emergence = (Standard_Deviation+mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
+                #Calculate ToE
+                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                ToEs[[k],[i]] = Time_of_Emergence
             
     lb.title(Precipitation_Type)
     lb.ylabel("kg/s*m^2")
@@ -385,7 +363,7 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
     
         
     # get the data to plot
-    PREC=ncFile.variables[Precipitation_Type][:]
+    PREC=ncFile.variables[Precipitation_Type][:]*24*60*60 # mm/day
     lats = ncFile.variables["XLAT"][:]
     lons = ncFile.variables["XLONG"][:]
     
@@ -467,18 +445,8 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
                 ToEs[[k],[i]]=3000
             else:
                 #calculate ToE
-                if(slope<0):
-                    Time_of_Emergence = (Standard_Deviation-mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
-                else:
-                    Time_of_Emergence = (Standard_Deviation+mn-Yint)/slope
-                    if(Time_of_Emergence>3000):
-                        ToEs[[k],[i]] = 3000
-                    else:
-                        ToEs[[k],[i]] = Time_of_Emergence
+                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                ToEs[[k],[i]] = Time_of_Emergence
             
     lb.title(Precipitation_Type)
     lb.ylabel("kg/s*m^2")
@@ -534,7 +502,7 @@ def WRFplot(plotvar,lats,lons,  vmin,vmax, title,varname, ColMap):
 def interpolate_ToE(file,grid_File, data_Type):        
             
     data=Dataset(file, "r+", format="NETCDF4")
-    toe=data.variables["ToE_for_" + data_Type][:] #* 24*60*60 # mm/day
+    toe=data.variables["ToE_for_" + data_Type][:] 
     lon=data.variables["lon"][:] - 360
     lat=data.variables["lat"][:] 
     
@@ -554,37 +522,37 @@ def interpolate_ToE(file,grid_File, data_Type):
     if(data.dimensions.__str__().find("wrf-latitude")==-1):
         data.createDimension( "wrf-latitude" , size=162)
         data.createDimension( "wrf-longitude" , size=123)
-        interpolated_ToE = data.createVariable("Interpolated ToE data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))              
-        interpolated_ToE.units = "years" 
-        ToEs = data.variables["Interpolated ToE data based on " + data_Type]
-        wrf_interp = interp2d(lon, lat, toe, kind='cubic')
-    
-        # Since X2 and Y2 are 2-d arrays for irregular grid need to do point by point
-        #    **THERE MAY BE A BETTER WAY?
-    
-        wrf_pr=zeros_like(wrf_lon)
-        for i in arange(wrf_lon.shape[0]):
-            for j in arange(wrf_lon.shape[1]):
-                wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
-                ToEs[[i],[j]]=wrf_pr[i,j]
-            
-    
-                # plot coarse and fine grids
-        LON, LAT = meshgrid(lon,lat)
-    
-        fig, ax = plt.subplots(nrows=1, ncols=2)
-        ax[0].pcolormesh(LON,LAT,toe, shading="auto")
-    
-        ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
-        head, tail = os.path.split(file)
-        x=tail.split("_")
-        plt.figure(figsize=(15,10))
-        WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), x[0] + " " + x[1] + " Based On " + data_Type, "ToE in years" , "RdYlBu_r")
-        plt.show()
-    
-    
-        plt.show()
-    
+    interpolated_ToE = data.createVariable("Interpolated ToE data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))              
+    interpolated_ToE.units = "years" 
+    ToEs = data.variables["Interpolated ToE data based on " + data_Type]
+    wrf_interp = interp2d(lon, lat, toe, kind='cubic')
+
+    # Since X2 and Y2 are 2-d arrays for irregular grid need to do point by point
+    #    **THERE MAY BE A BETTER WAY?
+
+    wrf_pr=zeros_like(wrf_lon)
+    for i in arange(wrf_lon.shape[0]):
+        for j in arange(wrf_lon.shape[1]):
+            wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
+            ToEs[[i],[j]]=wrf_pr[i,j]
+        
+
+            # plot coarse and fine grids
+    LON, LAT = meshgrid(lon,lat)
+
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+    ax[0].pcolormesh(LON,LAT,toe, shading="auto")
+
+    ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
+    head, tail = os.path.split(file)
+    x=tail.split("_")
+    plt.figure(figsize=(15,10))
+    WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), x[0] + " " + x[1] + " Based On " + data_Type, "ToE in years" , "RdYlBu_r")
+    plt.show()
+
+
+    plt.show()
+
     #close files         
     wdata.close()
     data.close()         
