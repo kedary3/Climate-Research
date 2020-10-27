@@ -111,7 +111,7 @@ for i in arange(wrf_lon.shape[0]):
 LON, LAT = meshgrid(lon,lat)
 
 fig, ax = plt.subplots(nrows=1, ncols=2)
-ax[0].pcolormesh(LON,LAT,[0,:,:], shading="auto")
+ax[0].pcolormesh(LON,LAT,pr95[0,:,:], shading="auto")
 
 ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
 
