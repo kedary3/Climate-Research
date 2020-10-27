@@ -131,6 +131,11 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
             d = wrf_TOE[[k],[i]]-gcm_TOE[[k],[i]]
             deltas[[k],[i]]=d
     
+    wrf_lon=delta_Data.variables["XLONG"][:] 
+    wrf_lat=delta_Data.variables["XLAT"][:]
+    plt.figure(figsize=(15,10))
+    WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
     wrf_Data.close()
     gcm_Data.close()
     
