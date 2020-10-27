@@ -264,42 +264,7 @@ def generate_WRF_TASMAX_ToE_Data(file, Temperature_Type):
     year2=2099
     ny = shape(TEMP)[1] # south-north - 123 - wrf / south-north - 21 - gcm
     nx = shape(TEMP)[2] # west-east - 162 - wrf / west-east - 33 - gcm
-    #check boundary points
-    #LOGIC: the values at the boundaries will be rewritten to have values of thier neighbors
-    #       towards the inside of the grid.
-    #        -------    AABCDEE
-    #        -ABCDE-    AABCDEE
-    #        -FGHIJ- => FFGHIJJ
-    #        -KLMNO-    KKLMNOO
-    #        -------    KKLMNOO
-    #
-    for t in range(year2-year0+1):
-        for k in range(ny):
-            for i in range(nx):
-            #corners  
-                if(k==0 and i==0): #top left
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k+1],[i+1]]
-                    
-                elif(k==ny-1 and i==nx-1): # bottom right
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k-1],[i-1]]
-                    
-                elif(k==ny-1 and i==0): #bottom left
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k-1],[i+1]]
-                    
-                elif(k==0 and i==nx-1): #top right
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k+1],[i-1]]          
-            #edges      
-                elif(k==0 and i!=0 and i!=nx-1): #top edge
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k+1],[i]]
-                    
-                elif(k!=0 and k!=ny-1 and i==0): #left edge
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k],[i+1]]
-                    
-                elif(k==ny-1 and i!=0 and i!=nx-1): #bottom edge
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k-1],[i]]
-                    
-                elif(k!=0 and k!=ny-1 and i==nx-1): #rigth edge
-                    TEMP[[t],[k],[i]]=TEMP[[t],[k],[i-1]]            
+    
                 
     TEMP=TEMP-273.15 #convert to Kelvin
     lats = ncFile.variables["XLAT"][:]
@@ -614,31 +579,31 @@ folder = r'Netcdf_Files'
 #for each wrf and gcm file, generate toe data for each data type and get interpolated gcm data
 for file in os.scandir(folder):
     head, tail = os.path.split(file) #tail gives the file name and type
-    if(file.__str__().find("prextr")!=-1): #if file has precipitation data
+    # if(file.__str__().find("prextr")!=-1): #if file has precipitation data
         
-        generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "prx")
-        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "prx")
+    #     generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "prx")
+    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "prx")
         
-        generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "pr95")
-        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "pr95")
+    #     generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "pr95")
+    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "pr95")
         
         
-    if(file.__str__().find("tasmaxextr")!=-1): #if file has tempature data
+    # if(file.__str__().find("tasmaxextr")!=-1): #if file has tempature data
         
-        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmax90")
-        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmax90")
+    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmax90")
+    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmax90")
         
-        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxx")
-        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxx")
+    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxx")
+    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxx")
         
-        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxn")
-        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxn")
+    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxn")
+    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxn")
     if(file.__str__().find("T2MAXextr")!=-1): #if file has tempature data
     
         generate_WRF_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "T2MAX90")
         generate_WRF_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "T2MAXx")
         
-    if(file.__str__().find("PRECextr")!=-1): #if file has precipitation data
+    # if(file.__str__().find("PRECextr")!=-1): #if file has precipitation data
     
-        generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PREC95")
-        generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PRECx")
+    #     generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PREC95")
+    #     generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PRECx")
