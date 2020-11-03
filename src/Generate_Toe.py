@@ -579,31 +579,31 @@ folder = r'Netcdf_Files'
 #for each wrf and gcm file, generate toe data for each data type and get interpolated gcm data
 for file in os.scandir(folder):
     head, tail = os.path.split(file) #tail gives the file name and type
-    # if(file.__str__().find("prextr")!=-1): #if file has precipitation data
+    if(file.__str__().find("prextr")!=-1): #if file has precipitation data
         
-    #     generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "prx")
-    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "prx")
+        generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "prx")
+        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "prx")
         
-    #     generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "pr95")
-    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "pr95")
+        generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "pr95")
+        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "pr95")
         
         
-    # if(file.__str__().find("tasmaxextr")!=-1): #if file has tempature data
+    if(file.__str__().find("tasmaxextr")!=-1): #if file has tempature data
         
-    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmax90")
-    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmax90")
+        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmax90")
+        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmax90")
         
-    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxx")
-    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxx")
+        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxx")
+        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxx")
         
-    #     generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxn")
-    #     interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxn")
+        generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "tasmaxn")
+        interpolate_ToE("Netcdf_Files" + "\\" + tail,"wrf_grid.nc", "tasmaxn")
     if(file.__str__().find("T2MAXextr")!=-1): #if file has tempature data
     
         generate_WRF_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "T2MAX90")
         generate_WRF_TASMAX_ToE_Data("Netcdf_Files" + "\\" + tail, "T2MAXx")
         
-    # if(file.__str__().find("PRECextr")!=-1): #if file has precipitation data
+    if(file.__str__().find("PRECextr")!=-1): #if file has precipitation data
     
-    #     generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PREC95")
-    #     generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PRECx")
+        generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PREC95")
+        generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + tail, "PRECx")
