@@ -134,10 +134,10 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_lon=delta_Data.variables["XLONG"][:] 
     wrf_lat=delta_Data.variables["XLAT"][:]
     plt.figure(figsize=(15,10))
-    WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
-                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
-    plt.savefig("Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
-                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type + ".png")
+    WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
+    plt.savefig("Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type + ".png")
     wrf_Data.close()
     gcm_Data.close()
     
@@ -152,16 +152,21 @@ if(os.path.exists("Netcdf_Files" + "\\" + "TOE_Deltas_from_gcm_to_wrf.nc") == Fa
 
 #for each wrf and gcm file, generate toe data for each data type and get interpolated gcm data
 delta_File = "Netcdf_Files" + "\\" + "TOE_Deltas_from_gcm_to_wrf.nc"
-# (wrf, gcm)
-
-Calculate_TOE_Delta("Netcdf_Files" + "\\" +'access1.3-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'ACCESS1-3_1970-2099_tasmaxextr.nc', delta_File, "tasmaxx")
-Calculate_TOE_Delta("Netcdf_Files" + "\\" +'access1.3-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'ACCESS1-3_1970-2099_tasmaxextr.nc', delta_File, "tasmax90")
-
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'access1.3-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'CCSM4_1970-2099_tasmaxextr.nc', delta_File, "tasmaxx")
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'access1.3-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'CCSM4_1970-2099_tasmaxextr.nc', delta_File, "tasmax90")
-
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'ccsm4-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'CCSM4_1970-2099_tasmaxextr.nc', delta_File, "tasmaxx")
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'ccsm4-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'CCSM4_1970-2099_tasmaxextr.nc', delta_File, "tasmax90")
-
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'ccsm4-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'ACCESS1-3_1970-2099_tasmaxextr.nc', delta_File, "tasmaxx")
-Calculate_TOE_Delta("Netcdf_Files" + "\\" + 'ccsm4-wrf_1970-2099_T2MAXextr.nc',"Netcdf_Files" + "\\" +  'ACCESS1-3_1970-2099_tasmaxextr.nc', delta_File, "tasmax90")
+# (wrf, gcm) (data_Type)
+t_Data_Types = ["tasmax90", "tasmaxx"]
+p_Data_Types = ["pr95", "prx"]
+wrf_Folder = r"Netcdf_Files" + "\\" +"wrf_Netcdf_Files"
+gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
+ 
+#for each wrf and gcm file, generate toe data for each data type
+for wrf_File in os.listdir(wrf_Folder): 
+    wrf_head, wrf_tail = os.path.split(wrf_File) #tail gives the file name and type
+    for gcm_File in os.listdir(gcm_Folder):
+        gcm_head, gcm_tail = os.path.split(gcm_File) #tail gives the file name and type
+        if(wrf_tail.__str__().find("T2MAXextr")>=0 and gcm_tail.__str__().find("tasmaxextr")>=0):
+            for temperature_Type in t_Data_Types:
+                Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, temperature_Type)  
+        if(wrf_tail.__str__().find("PRECextr")>=0 and gcm_tail.__str__().find("prextr")>=0):
+            # for precipitation_Type in p_Data_Types:
+            #     Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
+            continue
