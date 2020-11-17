@@ -104,9 +104,13 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_Data_Type = " "
     if(gcm_Data_Type == "tasmax90"):
         wrf_Data_Type = "T2MAX90"
-    elif(gcm_Data_Type =="tasmaxx"):
+    elif(gcm_Data_Type == "tasmaxx"):
         wrf_Data_Type = "T2MAXx"
-    elif(gcm_Data_Type !="tasmax90" and gcm_Data_Type != "tasmaxx"):
+    elif(gcm_Data_Type == "pr95"):
+        wrf_Data_Type = "PREC95"
+    elif(gcm_Data_Type == "prx"):
+        wrf_Data_Type = "PRECx"
+    elif(gcm_Data_Type !="tasmax90" and gcm_Data_Type != "tasmaxx" and gcm_Data_Type != "prx" and gcm_Data_Type != "pr95"):
         print("invalid gcm_Data_Type")
         return 1
     wrf_Data = Dataset(wrf_File, "r" , format = "NETCDF4")
@@ -167,6 +171,6 @@ for wrf_File in os.listdir(wrf_Folder):
             for temperature_Type in t_Data_Types:
                 Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, temperature_Type)  
         if(wrf_tail.__str__().find("PRECextr")>=0 and gcm_tail.__str__().find("prextr")>=0):
-            # for precipitation_Type in p_Data_Types:
-            #     Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
-            continue
+            for precipitation_Type in p_Data_Types:
+                Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
+                
