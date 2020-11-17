@@ -7,11 +7,13 @@ Created on Wed Oct  7 12:35:10 2020
 
 
 #to dos
-	#do not use prn
-	#investigate negative years inaccuracy
-	#use 24*60*60 for mm/day for both wrf and gcm
-	#Delta toe for access and ccsm4 between wrf and gcm for temp and try prec
-		#all combinations
+	#fix pr calculations
+        #problem variables
+            #MICROC5 - prx
+            #NorESM1-M - prx
+            #bcc-csm1-1 - prx 
+            #but pr95 is fine for these above
+    #fix logic for combinations: gen_toe.py
 
 
 
@@ -234,7 +236,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
                     ToEs[[k],[i]] = Time_of_Emergence
             
     lb.title(Precipitation_Type)
-    lb.ylabel("kg/s*m^2")
+    lb.ylabel("mm/day")
     lb.xlabel("Year")
     lb.show()       
     #close file
