@@ -99,6 +99,33 @@ def clone(src_file, trg_file): #function to copy attributes, variables, and dime
     # return the file and close the source
     src.close
     return trg
+
+#define helper function that removes the border from precipitation data
+
+"""
+||||
+|OO|  => OO
+|OO|     OO
+||||
+"""
+def remove_Border(twoD_array):
+    twoD_array = np.array(twoD_array)
+    y , x = shape(twoD_array)
+    nx = x-2
+    ny = y-2
+    dim = np.arange(nx*ny)
+    dim = dim.reshape((ny, nx))
+    new_Array = np.zeros_like(dim)
+    x_count = 0
+    y_count = 0
+    for k in range(1,y-1):
+        for i in range(1,x-1):
+            (new_Array[[y_count],[x_count]]) = twoD_array[[k],[i]]
+            x_count += 1
+        x_count = 0
+        y_count += 1
+           
+    return new_Array
 #define helper delta calculator.
 def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_Data_Type = " "
@@ -110,7 +137,8 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
         wrf_Data_Type = "PREC95"
     elif(gcm_Data_Type == "prx"):
         wrf_Data_Type = "PRECx"
-    elif(gcm_Data_Type !="tasmax90" and gcm_Data_Type != "tasmaxx" and gcm_Data_Type != "prx" and gcm_Data_Type != "pr95"):
+    elif(gcm_Data_Type !="tasmax90" and gcm_Data_Type != "tasmaxx" and 
+         gcm_Data_Type != "prx" and gcm_Data_Type != "pr95"):
         print("invalid gcm_Data_Type")
         return 1
     wrf_Data = Dataset(wrf_File, "r" , format = "NETCDF4")
@@ -138,7 +166,13 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_lon=delta_Data.variables["XLONG"][:] 
     wrf_lat=delta_Data.variables["XLAT"][:]
     plt.figure(figsize=(15,10))
-    WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+    #if the variables are PREC based, then we need to remove border
+    if(gcm_Data_Type == "prx" or gcm_Data_Type == "pr95"): 
+        deltas= remove_Border(deltas)
+        WRFplot(remove_Border(deltas), wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
+    else:
+        WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
     plt.savefig("Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type + ".png")
@@ -162,7 +196,7 @@ p_Data_Types = ["pr95", "prx"]
 wrf_Folder = r"Netcdf_Files" + "\\" +"wrf_Netcdf_Files"
 gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
  
-#for each wrf and gcm file, generate toe data for each data type
+#for each wrf and gcm file, generate toe delta data for each data type
 for wrf_File in os.listdir(wrf_Folder): 
     wrf_head, wrf_tail = os.path.split(wrf_File) #tail gives the file name and type
     for gcm_File in os.listdir(gcm_Folder):
@@ -173,4 +207,4 @@ for wrf_File in os.listdir(wrf_Folder):
         if(wrf_tail.__str__().find("PRECextr")>=0 and gcm_tail.__str__().find("prextr")>=0):
             for precipitation_Type in p_Data_Types:
                 Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
-                
+

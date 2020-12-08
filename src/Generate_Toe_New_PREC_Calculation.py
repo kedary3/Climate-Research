@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct  7 12:35:10 2020
+Created on Tue Dec  8 00:44:39 2020
 
-@author: Kedar Yadav
+@author: Kedar
 """
 
 
-#to dos
-	#fix pr calculations
-        #problem variables
-            #MICROC5 - prx
-            #NorESM1-M - prx
-            #bcc-csm1-1 - prx 
-            #but pr95 is fine for these above
-    #fix logic for combinations: gen_toe.py
+#todo
+    #generate plots of  at a specific gridpoints
+        
+    #change year limit around
+    #median ToEs
+    #change PRECIP calculation to appendix 4 calculation
+        #compare median gcm vs median wrf
+    #take out border of toe plots for masking precipitation
+    #take out border of delta plots for masking  
 
-
+#ASKS
+    #ask about ddof in std
 
 from numpy import (
         linspace,array, log,exp,sin,cos,sqrt, pi,e, 
@@ -105,7 +107,7 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
         for i in range(nx):
             
             #find the mean and standard deviations
-            Standard_Deviation=np.std(TEMP[:,[k],[i]][0:31])
+            Standard_Deviation=np.std(TEMP[:,[k],[i]][0:31], ddof=1)
             mn=np.mean(TEMP[:,[k],[i]][0:31])
             
             #get mean plus std and record it in file
@@ -175,16 +177,16 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
     if(ncFile.variables.__str__().find("regressionValues_Slope_for_" + Precipitation_Type)==-1):
         regressionValues_Slopes = ncFile.createVariable("regressionValues_Slope_for_" + Precipitation_Type,
                                                         "float32" , ("lat","lon",))
-        regressionValues_Slopes.units = "kg per m^2 per year"
+        regressionValues_Slopes.units = "mm per day per year"
         regressionValues_Yints =  ncFile.createVariable("regressionValues_Yint_for_" + Precipitation_Type,
                                                         "float32", ("lat","lon",))
-        regressionValues_Yints.units = "kg per m^2"
+        regressionValues_Yints.units = "mm/day"
     if(ncFile.variables.__str__().find("Standard_Deviations_for_" + Precipitation_Type)==-1):
         std = ncFile.createVariable("Standard_Deviations_for_" + Precipitation_Type, "float32" , ("lat","lon",))
-        std.units = "kg per m^2"
+        std.units = "mm/day"
     if(ncFile.variables.__str__().find("Means_for_" + Precipitation_Type)==-1):
         mean = ncFile.createVariable("Means_for_" + Precipitation_Type, "float32" , ("lat","lon",))
-        mean.units = "kg per m^2" 
+        mean.units = "mm/day" 
     #define ToE variable at each grid point
     if(ncFile.variables.__str__().find("ToE_for_" + Precipitation_Type)==-1):
         ToE = ncFile.createVariable("ToE_for_" + Precipitation_Type, "float32", ("lat","lon",))
@@ -230,7 +232,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
                 ToEs[[k],[i]]=year2
             else:
                 #calculate ToE
-                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                Time_of_Emergence = year1 + Standard_Deviation/np.abs(slope)
                 if(Time_of_Emergence>year2):
                     ToEs[[k],[i]]=year2
                 else:
@@ -411,16 +413,16 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
     if(ncFile.variables.__str__().find("regressionValues_Slope_for_" + Precipitation_Type)==-1):
         regressionValues_Slopes = ncFile.createVariable("regressionValues_Slope_for_" + Precipitation_Type,
                                                         "float32" , ("south_north","west_east",))
-        regressionValues_Slopes.units = "kg per m^2 per year"
+        regressionValues_Slopes.units = "mm per day per year"
         regressionValues_Yints =  ncFile.createVariable("regressionValues_Yint_for_" + Precipitation_Type,
                                                         "float32", ("south_north","west_east",))
-        regressionValues_Yints.units = "kg per m^2"
+        regressionValues_Yints.units = "mm/day"
     if(ncFile.variables.__str__().find("Standard_Deviations_for_" + Precipitation_Type)==-1):
         std = ncFile.createVariable("Standard_Deviations_for_" + Precipitation_Type, "float32" , ("south_north","west_east",))
-        std.units = "kg per m^2"
+        std.units = "mm/day"
     if(ncFile.variables.__str__().find("Means_for_" + Precipitation_Type)==-1):
         mean = ncFile.createVariable("Means_for_" + Precipitation_Type, "float32" , ("south_north","west_east",))
-        mean.units = "kg per m^2" 
+        mean.units = "mm/day" 
     #define ToE variable at each grid point
     if(ncFile.variables.__str__().find("ToE_for_" + Precipitation_Type)==-1):
         ToE = ncFile.createVariable("ToE_for_" + Precipitation_Type, "float32", ("south_north","west_east",))
@@ -465,7 +467,7 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
                 ToEs[[k],[i]]=year2
             else:
                 #calculate ToE
-                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                Time_of_Emergence = year1 + Standard_Deviation/np.abs(slope)
                 if(Time_of_Emergence>year2):
                     ToEs[[k],[i]] = year2
                 else:
@@ -568,16 +570,34 @@ def interpolate_ToE(file,grid_File, data_Type):
     plt.figure(figsize=(15,10))
     WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), x[0] + " " + x[1] + " Based On " + data_Type, "ToE in years" , "RdYlBu_r")
     plt.show()
-
-
     plt.show()
 
     #close files         
     wdata.close()
     data.close()         
         
+def get_Medain_ToE(file, data_Type):
+    data=Dataset(file, "r", format="NETCDF4")
+    toe=data.variables["ToE_for_" + data_Type][:] 
+    head, tail = os.path.split(file)
+    x=tail.split("_")
+    
+    if(data_Type !="PREC95" and data_Type !="PRECx" and
+       data_Type !="T2MAX90" and data_Type !="T2MAXx" and 
+       data_Type !="prx" and data_Type !="pr95" and 
+       data_Type !="tasmaxx" and data_Type != "tasmax90"):
+        print("invalid data type")
+        return 1 
+    #turn 2d masked array into 1 d array so numpy can sort and find the median
+    array = toe.flatten()
+    print("The median ToE given by " + x[0] + " " + x[1] + " Based On " + data_Type + " is:", np.median(array))
+    
+    data.close()    
+    return ((x[0] + " " + x[1]) , (data_Type) , (np.median(array)))
 #execute
 import os
+
+
 
 #for each wrf and gcm file, generate toe data for each data type and get interpolated gcm data
 # (wrf, gcm) (data_Type)
@@ -607,3 +627,44 @@ for gcm_File in os.listdir(gcm_Folder):
         for precipitation_Type in gcm_p_Data_Types:
             generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, precipitation_Type)
             interpolate_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
+
+
+#for each data type and model calculate and store the median time of emergence.
+median_File = open("Median_Toe.dat", "w")
+median_File.write("Model Name               data type        Median ToE")  # write table header
+Models = []
+data_Types = []
+median_ToEs = []
+for wrf_File in os.listdir(wrf_Folder): 
+    wrf_head, wrf_tail = os.path.split(wrf_File) #tail gives the file name and type
+    if(wrf_tail.__str__().find("T2MAXextr")>=0):
+        for temperature_Type in wrf_t_Data_Types:
+            median = get_Medain_ToE("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, temperature_Type)
+            Models.append(median[0])
+            data_Types.append(median[1])
+            median_ToEs.append(median[2])
+    if(wrf_tail.__str__().find("PRECextr")>=0):
+        for precipitation_Type in wrf_p_Data_Types:
+            median = get_Medain_ToE("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, precipitation_Type)
+            Models.append(median[0])
+            data_Types.append(median[1])
+            median_ToEs.append(median[2])
+for gcm_File in os.listdir(gcm_Folder):
+    gcm_head, gcm_tail = os.path.split(gcm_File) 
+    if(gcm_tail.__str__().find("tasmaxextr")>=0):
+        for temperature_Type in gcm_t_Data_Types:
+            median = get_Medain_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, temperature_Type)
+            Models.append(median[0])
+            data_Types.append(median[1])
+            median_ToEs.append(median[2])
+    if(gcm_tail.__str__().find("prextr")>=0):
+        for precipitation_Type in gcm_p_Data_Types:
+            median = get_Medain_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, precipitation_Type)
+            Models.append(median[0])
+            data_Types.append(median[1])
+            median_ToEs.append(median[2])
+
+for model, data_Type, median_ToE  in zip(Models, data_Types, median_ToEs):
+    median_File.write("\n")
+    median_File.write(model + "    " + data_Type + "        " + str(median_ToE))
+ 
