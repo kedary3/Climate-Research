@@ -100,32 +100,32 @@ def clone(src_file, trg_file): #function to copy attributes, variables, and dime
     src.close
     return trg
 
-#define helper function that removes the border from precipitation data
+# #define helper function that removes the border from precipitation data
 
-"""
-||||
-|OO|  => OO
-|OO|     OO
-||||
-"""
-def remove_Border(twoD_array):
-    twoD_array = np.array(twoD_array)
-    y , x = shape(twoD_array)
-    nx = x-2
-    ny = y-2
-    dim = np.arange(nx*ny)
-    dim = dim.reshape((ny, nx))
-    new_Array = np.zeros_like(dim)
-    x_count = 0
-    y_count = 0
-    for k in range(1,y-1):
-        for i in range(1,x-1):
-            (new_Array[[y_count],[x_count]]) = twoD_array[[k],[i]]
-            x_count += 1
-        x_count = 0
-        y_count += 1
+# """
+# ||||
+# |OO|  => OO
+# |OO|     OO
+# ||||
+# """
+# def remove_Border(twoD_array):
+#     twoD_array = np.array(twoD_array)
+#     y , x = shape(twoD_array)
+#     nx = x-2
+#     ny = y-2
+#     dim = np.arange(nx*ny)
+#     dim = dim.reshape((ny, nx))
+#     new_Array = np.zeros_like(dim)
+#     x_count = 0
+#     y_count = 0
+#     for k in range(1,y-1):
+#         for i in range(1,x-1):
+#             (new_Array[[y_count],[x_count]]) = twoD_array[[k],[i]]
+#             x_count += 1
+#         x_count = 0
+#         y_count += 1
            
-    return new_Array
+#     return new_Array
 #define helper delta calculator.
 def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_Data_Type = " "
@@ -168,8 +168,10 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     plt.figure(figsize=(15,10))
     #if the variables are PREC based, then we need to remove border
     if(gcm_Data_Type == "prx" or gcm_Data_Type == "pr95"): 
-        deltas= remove_Border(deltas)
-        WRFplot(remove_Border(deltas), wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+        deltas= deltas[4:-4,4:-4]
+        wrf_lon=wrf_lon[4:-4,4:-4]
+        wrf_lat=wrf_lat[4:-4,4:-4]
+        WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
     else:
         WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +

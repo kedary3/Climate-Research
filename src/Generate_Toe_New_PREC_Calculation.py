@@ -133,7 +133,7 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
                 ToEs[[k],[i]]=year2
             else:
                 #calculate ToE
-                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                Time_of_Emergence = year1 + Standard_Deviation/np.abs(slope)
                 if(Time_of_Emergence>year2):
                     ToEs[[k],[i]]=year2
                 else:
@@ -334,7 +334,7 @@ def generate_WRF_TASMAX_ToE_Data(file, Temperature_Type):
                 ToEs[[k],[i]]=year2
             else:
                 #calculate ToE
-                Time_of_Emergence = (mn+(np.sign(slope)*Standard_Deviation)-Yint)/slope
+                Time_of_Emergence = year1 + Standard_Deviation/np.abs(slope)
                 if(Time_of_Emergence>year2):
                     ToEs[[k],[i]]=year2
                 else:
