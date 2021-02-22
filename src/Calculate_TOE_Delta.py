@@ -193,8 +193,8 @@ if(os.path.exists("Netcdf_Files" + "\\" + "TOE_Deltas_from_gcm_to_wrf.nc") == Fa
 #for each wrf and gcm file, generate toe data for each data type and get interpolated gcm data
 delta_File = "Netcdf_Files" + "\\" + "TOE_Deltas_from_gcm_to_wrf.nc"
 # (wrf, gcm) (data_Type)
-t_Data_Types = ["tasmax90", "tasmaxx"]
-p_Data_Types = ["pr95", "prx"]
+t_Data_Types = ["tasmax90"]
+p_Data_Types = ["pr95"]
 wrf_Folder = r"Netcdf_Files" + "\\" +"wrf_Netcdf_Files"
 gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
  
