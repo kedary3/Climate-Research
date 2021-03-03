@@ -62,7 +62,7 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
     year0=1970
     year=arange(year)+year0
     year1=1999
-    year2=2099
+    year2=2300
     yearLimit=2300
     ny = shape(TEMP)[1] # south-north - 123 - wrf / south-north - 21 - gcm
     nx = shape(TEMP)[2] # west-east - 162 - wrf / west-east - 33 - gcm
@@ -169,7 +169,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
     year0=1970
     year=arange(year)+year0
     year1=1999
-    year2=2099
+    year2=2300
     ny = shape(PREC)[1] # south-north - 123
     nx = shape(PREC)[2] # west-east - 162
     
@@ -266,7 +266,7 @@ def generate_WRF_TASMAX_ToE_Data(file, Temperature_Type):
     year0=1970
     year=arange(year)+year0
     year1=1999
-    year2=2099
+    year2=2300
     ny = shape(TEMP)[1] # south-north - 123 - wrf / south-north - 21 - gcm
     nx = shape(TEMP)[2] # west-east - 162 - wrf / west-east - 33 - gcm
     
@@ -362,7 +362,7 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
     year0=1970
     year=arange(year)+year0
     year1=1999
-    year2=2099
+    year2=2300
     ny = shape(PREC)[1] # south-north - 123
     nx = shape(PREC)[2] # west-east - 162
         
@@ -375,7 +375,7 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
     #        -KLMNO-    KKLMNOO
     #        -------    KKLMNOO
     #
-    for t in range(year2-year0+1):
+    for t in range(2099-year0+1):
         for k in range(ny):
             for i in range(nx):
             #corners  
@@ -575,7 +575,61 @@ def interpolate_ToE(file,grid_File, data_Type):
     #close files         
     wdata.close()
     data.close()         
+
+def interpolate_SDV(file,grid_File, data_Type):        
+            
+    data=Dataset(file, "r+", format="NETCDF4")
+    SDV=data.variables["Standard_Deviations_for_" + data_Type][:] 
+    lon=data.variables["lon"][:] - 360
+    lat=data.variables["lat"][:] 
+    
+    # Here use x as lon and y as lat and Z as data field from GCM
+    x = lon
+    y = lat
+    Z = SDV
+    # here X2 and Y2 (upper case) are lon and lat from WRF grid.nc
+    # note that lat and lon are 2d arrays 
+    #x2 = linspace(0, 1, 123)
+    #y2 = linspace(0, 1, 162)
+    #X2,Y2 = meshgrid(x2,y2) # from grid.nc
+    
+    wdata=Dataset(grid_File, "r", format="NETCDF4")
+    wrf_lon=wdata.variables["XLONG"][:] 
+    wrf_lat=wdata.variables["XLAT"][:] 
+    if(data.dimensions.__str__().find("wrf-latitude")==-1):
+        data.createDimension( "wrf-latitude" , size=162)
+        data.createDimension( "wrf-longitude" , size=123)
+    interpolated_SDV = data.createVariable("Interpolated SDV data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))               
+    SDVs = data.variables["Interpolated SDV data based on " + data_Type]
+    wrf_interp = interp2d(lon, lat, SDV, kind='cubic')
+
+    # Since X2 and Y2 are 2-d arrays for irregular grid need to do point by point
+    #    **THERE MAY BE A BETTER WAY?
+
+    wrf_pr=zeros_like(wrf_lon)
+    for i in arange(wrf_lon.shape[0]):
+        for j in arange(wrf_lon.shape[1]):
+            wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
+            SDVs[[i],[j]]=wrf_pr[i,j]
         
+
+    # plot coarse and fine grids
+    # LON, LAT = meshgrid(lon,lat)
+
+    # fig, ax = plt.subplots(nrows=1, ncols=2)
+    # ax[0].pcolormesh(LON,LAT,toe, shading="auto")
+
+    # ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
+    # head, tail = os.path.split(file)
+    # x=tail.split("_")
+    # plt.figure(figsize=(15,10))
+    # WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), x[0] + " " + x[1] + " Based On " + data_Type, "ToE in years" , "RdYlBu_r")
+    # plt.show()
+    # plt.show()
+
+    #close files         
+    wdata.close()
+    data.close()                 
 def get_Medain_ToE(file, data_Type):
     data=Dataset(file, "r", format="NETCDF4")
     toe=data.variables["ToE_for_" + data_Type][:] 
@@ -623,10 +677,12 @@ for gcm_File in os.listdir(gcm_Folder):
         for temperature_Type in gcm_t_Data_Types:
             generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, temperature_Type)
             interpolate_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", temperature_Type)
+            interpolate_SDV("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", temperature_Type)
     if(gcm_tail.__str__().find("pr_extr")>=0):
         for precipitation_Type in gcm_p_Data_Types:
             generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, precipitation_Type)
             interpolate_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
+            interpolate_SDV("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
 
 
 #for each data type and model calculate and store the median time of emergence.
