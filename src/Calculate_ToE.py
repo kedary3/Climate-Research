@@ -23,10 +23,10 @@ from numpy import (
         linspace,array, log,exp,sin,cos,sqrt, pi,e, 
         zeros, ones, amin,amax, argmax, arange, shape
         )
-from matplotlib.pyplot import plot, show
+
 
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 from matplotlib.cm import get_cmap
 import cartopy
@@ -69,10 +69,9 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
     #splice the variable array along the time axis, separating model and historical data
     #31 is chosen because python is exclusive on the second range number
     Historical_TEMP = TEMP[:,1,1][0:31]
-    plt.plot(year[0:31],Historical_TEMP)
+    
     Model_TEMP = TEMP[:,1,1][30:130]
-    plt.plot(year[30:130],Model_TEMP)
-    plt.show()
+    
     
     #Prepare Variables for ToE Calculation
     if(ncFile.variables.__str__().find("regressionValues_Slope_for_" + Temperature_Type)==-1):
@@ -102,7 +101,7 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
     stds     = ncFile.variables["Standard_Deviations_for_" + Temperature_Type]
     means    = ncFile.variables["Means_for_" + Temperature_Type]
     ToEs     = ncFile.variables["ToE_for_" + Temperature_Type]
-    lb.figure()
+    
     for k in range(ny):
         for i in range(nx):
             
@@ -139,10 +138,7 @@ def generate_GCM_TASMAX_ToE_Data(file, Temperature_Type):
                 else:
                     ToEs[[k],[i]] = Time_of_Emergence
             
-    lb.title(Temperature_Type)
-    lb.ylabel("Tmax (deg-C)")
-    lb.xlabel("Year")
-    lb.show()       
+     
     #close file
     ncFile.close()
 
@@ -201,7 +197,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
     stds     = ncFile.variables["Standard_Deviations_for_" + Precipitation_Type]
     means    = ncFile.variables["Means_for_" + Precipitation_Type]
     ToEs     = ncFile.variables["ToE_for_" + Precipitation_Type]
-    lb.figure()
+    
     for k in range(ny):
         for i in range(nx):
             
@@ -238,10 +234,7 @@ def generate_GCM_PREC_ToE_Data(file, Precipitation_Type):
                 else:
                     ToEs[[k],[i]] = Time_of_Emergence
             
-    lb.title(Precipitation_Type)
-    lb.ylabel("mm/day")
-    lb.xlabel("Year")
-    lb.show()       
+    
     #close file
     ncFile.close()
 
