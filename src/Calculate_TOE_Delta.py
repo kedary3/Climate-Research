@@ -146,14 +146,14 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     delta_Data = Dataset(delta_File, "r+", format = "NETCDF4")
     wrf_TOE = wrf_Data.variables["ToE_for_" + wrf_Data_Type][:]
     gcm_TOE = gcm_Data.variables["Interpolated ToE data based on " + gcm_Data_Type][:]
-    if(delta_Data.variables.__str__().find("Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
-                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type)==-1):
-        delta = delta_Data.createVariable("Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
-                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type,
+    if(delta_Data.variables.__str__().find("Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type)==-1):
+        delta = delta_Data.createVariable("Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type,
                                       "float32", ("south_north", "west_east",))
         delta.units = "years"
-    deltas = delta_Data.variables["Delta between "  + wrf_File.split("\\")[1].split("-")[0] + "-wrf" +
-                                      " and " + gcm_File.split("\\")[1].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type]
+    deltas = delta_Data.variables["Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+                                      " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type]
     
     #for each grid point assign a delta based on (diff=wrf-gcm)
     ny = shape(wrf_TOE)[0] # south-north - 123 - wrf / south-north - 21 - gcm
@@ -176,7 +176,7 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     else:
         WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
-    plt.savefig("Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+    plt.savefig("ToE Deltas" + "\\" + "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type + ".png")
     wrf_Data.close()
     gcm_Data.close()
@@ -201,12 +201,18 @@ gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
 #for each wrf and gcm file, generate toe delta data for each data type
 for wrf_File in os.listdir(wrf_Folder): 
     wrf_head, wrf_tail = os.path.split(wrf_File) #tail gives the file name and type
+    
     for gcm_File in os.listdir(gcm_Folder):
         gcm_head, gcm_tail = os.path.split(gcm_File) #tail gives the file name and type
-        if(wrf_tail.__str__().find("T2MAXextr")>=0 and gcm_tail.__str__().find("tasmaxextr")>=0):
-            for temperature_Type in t_Data_Types:
-                Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, temperature_Type)  
-        if(wrf_tail.__str__().find("PRECextr")>=0 and gcm_tail.__str__().find("prextr")>=0):
-            for precipitation_Type in p_Data_Types:
-                Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
+        wrf_Model = wrf_tail.split("-")[0]
+        
+        if(gcm_tail.__str__().find(wrf_Model)>=0):
+            
+        
+            if(wrf_tail.__str__().find("T2MAX")>=0 and gcm_tail.__str__().find("tasmax")>=0):
+                for temperature_Type in t_Data_Types:
+                    Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, temperature_Type)  
+            if(wrf_tail.__str__().find("PREC")>=0 and gcm_tail.__str__().find("pr_extr")>=0):
+                for precipitation_Type in p_Data_Types:
+                    Calculate_TOE_Delta("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, "Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" +  gcm_tail, delta_File, precipitation_Type)  
 
