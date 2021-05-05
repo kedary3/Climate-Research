@@ -396,7 +396,7 @@ def generate_WRF_PREC_ToE_Data(file, Precipitation_Type):
                 elif(k!=0 and k!=ny-1 and i==nx-1): #rigth edge
                     PREC[[t],[k],[i]]=PREC[[t],[k],[i-1]]            
                 
-    PREC=PREC*24*60*60 # mm/day
+    # PREC=PREC*24*60*60 # mm/day
     
     lats = ncFile.variables["XLAT"][:]
     lons = ncFile.variables["XLONG"][:]
@@ -536,8 +536,9 @@ def interpolate_ToE(file,grid_File, data_Type):
     if(data.dimensions.__str__().find("wrf-latitude")==-1):
         data.createDimension( "wrf-latitude" , size=162)
         data.createDimension( "wrf-longitude" , size=123)
-    interpolated_ToE = data.createVariable("Interpolated ToE data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))              
-    interpolated_ToE.units = "years" 
+    if(data.__str__().find("Interpolated ToE data based on " + data_Type)==-1):
+        interpolated_ToE = data.createVariable("Interpolated ToE data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))              
+        interpolated_ToE.units = "years" 
     ToEs = data.variables["Interpolated ToE data based on " + data_Type]
     wrf_interp = interp2d(lon, lat, toe, kind='cubic')
 
@@ -592,7 +593,8 @@ def interpolate_SDV(file,grid_File, data_Type):
     if(data.dimensions.__str__().find("wrf-latitude")==-1):
         data.createDimension( "wrf-latitude" , size=162)
         data.createDimension( "wrf-longitude" , size=123)
-    interpolated_SDV = data.createVariable("Interpolated SDV data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))               
+    if(data.variables.__str__().find("Interpolated SDV data based on " + data_Type)==-1):
+        interpolated_SDV = data.createVariable("Interpolated SDV data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))               
     SDVs = data.variables["Interpolated SDV data based on " + data_Type]
     wrf_interp = interp2d(lon, lat, SDV, kind='cubic')
 
@@ -604,6 +606,62 @@ def interpolate_SDV(file,grid_File, data_Type):
         for j in arange(wrf_lon.shape[1]):
             wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
             SDVs[[i],[j]]=wrf_pr[i,j]
+        
+
+    # plot coarse and fine grids
+    # LON, LAT = meshgrid(lon,lat)
+
+    # fig, ax = plt.subplots(nrows=1, ncols=2)
+    # ax[0].pcolormesh(LON,LAT,toe, shading="auto")
+
+    # ax[1].pcolormesh(wrf_lon,wrf_lat,wrf_pr, shading="auto")
+    # head, tail = os.path.split(file)
+    # x=tail.split("_")
+    # plt.figure(figsize=(15,10))
+    # WRFplot(wrf_pr,wrf_lat,wrf_lon, amin(wrf_pr),amax(wrf_pr), x[0] + " " + x[1] + " Based On " + data_Type, "ToE in years" , "RdYlBu_r")
+    # plt.show()
+    # plt.show()
+
+    #close files         
+    wdata.close()
+    data.close()                 
+def interpolate_Slope(file,grid_File, data_Type):
+        
+            
+    data=Dataset(file, "r+", format="NETCDF4")
+    Slope=data.variables["regressionValues_Slope_for_" + data_Type][:] 
+    lon=data.variables["lon"][:] - 360
+    lat=data.variables["lat"][:] 
+    
+    # Here use x as lon and y as lat and Z as data field from GCM
+    x = lon
+    y = lat
+    Z = Slope
+    # here X2 and Y2 (upper case) are lon and lat from WRF grid.nc
+    # note that lat and lon are 2d arrays  
+    #x2 = linspace(0, 1, 123)
+    #y2 = linspace(0, 1, 162)
+    #X2,Y2 = meshgrid(x2,y2) # from grid.nc
+    
+    wdata=Dataset(grid_File, "r", format="NETCDF4")
+    wrf_lon=wdata.variables["XLONG"][:] 
+    wrf_lat=wdata.variables["XLAT"][:] 
+    if(data.dimensions.__str__().find("wrf-latitude")==-1):
+        data.createDimension( "wrf-latitude" , size=162)
+        data.createDimension( "wrf-longitude" , size=123)
+    if(data.variables.__str__().find("Interpolated Slope data based on " + data_Type)==-1):
+        interpolated_Slope = data.createVariable("Interpolated Slope data based on " + data_Type, "float32" , ("wrf-longitude","wrf-latitude",))               
+    Slopes = data.variables["Interpolated Slope data based on " + data_Type]
+    wrf_interp = interp2d(lon, lat, Slope, kind='cubic')
+
+    # Since X2 and Y2 are 2-d arrays for irregular grid need to do point by point
+    #    **THERE MAY BE A BETTER WAY?
+
+    wrf_pr=zeros_like(wrf_lon)
+    for i in arange(wrf_lon.shape[0]):
+        for j in arange(wrf_lon.shape[1]):
+            wrf_pr[i,j]=wrf_interp(wrf_lon[i,j],wrf_lat[i,j])
+            Slopes[[i],[j]]=wrf_pr[i,j]
         
 
     # plot coarse and fine grids
@@ -655,6 +713,7 @@ wrf_p_Data_Types = ["PREC95", "PRECx"]
 wrf_Folder = r"Netcdf_Files" + "\\" +"wrf_Netcdf_Files"
 gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
 #for each wrf and gcm file, generate toe data for each data type
+#wrf
 for wrf_File in os.listdir(wrf_Folder): 
     wrf_head, wrf_tail = os.path.split(wrf_File) #tail gives the file name and type
     if(wrf_tail.__str__().find("T2MAX_extr")>=0):
@@ -663,7 +722,8 @@ for wrf_File in os.listdir(wrf_Folder):
     if(wrf_tail.__str__().find("PREC_extr")>=0):
         for precipitation_Type in wrf_p_Data_Types:
             generate_WRF_PREC_ToE_Data("Netcdf_Files" + "\\" + "wrf_Netcdf_Files" + "\\" + wrf_tail, precipitation_Type)
-            
+
+#gcm            
 for gcm_File in os.listdir(gcm_Folder):
     gcm_head, gcm_tail = os.path.split(gcm_File) 
     if(gcm_tail.__str__().find("tasmax_extr")>=0):
@@ -671,11 +731,13 @@ for gcm_File in os.listdir(gcm_Folder):
             generate_GCM_TASMAX_ToE_Data("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, temperature_Type)
             interpolate_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", temperature_Type)
             interpolate_SDV("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", temperature_Type)
+            interpolate_Slope("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", temperature_Type)
     if(gcm_tail.__str__().find("pr_extr")>=0):
         for precipitation_Type in gcm_p_Data_Types:
             generate_GCM_PREC_ToE_Data("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail, precipitation_Type)
             interpolate_ToE("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
             interpolate_SDV("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
+            interpolate_Slope("Netcdf_Files" + "\\" + "gcm_Netcdf_Files" + "\\" + gcm_tail,"wrf_grid.nc", precipitation_Type)
 
 
 #for each data type and model calculate and store the median time of emergence.

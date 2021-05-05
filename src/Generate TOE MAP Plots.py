@@ -24,7 +24,7 @@ import pylab as lb
 from numpy import *
 from scipy.interpolate import interp2d
 import os
-
+import numpy.ma as ma
 #script for generating a single image with three panes of toe plots
     # for each model pair
 #         -temperature wise
@@ -62,6 +62,8 @@ def WRFplot(plotvar,lats,lons,  vmin,vmax, title,varname, ColMap):
     ax.coastlines('50m', linewidth=0.8)
     
     # Color in the data on the map with smoothing
+    # plotvar = ma.masked_invalid(plotvar)
+    # print(plotvar)
     plt.pcolormesh(lons,lats,
                    plotvar,vmin=vmin,vmax=vmax,
                    transform=crs.PlateCarree(),
@@ -78,7 +80,13 @@ def WRFplot(plotvar,lats,lons,  vmin,vmax, title,varname, ColMap):
     
     # Add a title
     plt.title(title)     
-    
+
+def mask(ar): #mask values above the cuttoff
+    for i in range(shape(ar)[0]):
+        for k in range(shape(ar)[1]):
+            if ar[i][k]>2299:
+                ar[i][k] = np.nan
+    return ar    
 def generate_Single_Plots():
     t_Data_Types = ["tasmax90"]
     p_Data_Types = ["pr95"]
@@ -115,13 +123,14 @@ def generate_Single_Plots():
                         wrf_lon = wrf_lon[4:-4,4:-4]
                         wrf_lat = wrf_lat[4:-4,4:-4]
                         gcm_TOE = gcm_TOE[4:-4,4:-4]
-                        plt.figure(figsize=(15,10))
-                        WRFplot(wrf_TOE, wrf_lat, wrf_lon,  amin(wrf_TOE),amax(wrf_TOE), "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        
+                        plt.figure(figsize=(7.5,5))
+                        WRFplot(wrf_TOE, wrf_lat, wrf_lon,  2010,2050, "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"TOE in Years", "RdYlBu_r")
                         plt.savefig("WRF TOE Plots"+ "\\" + "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
-                        plt.figure(figsize=(15,10))
-                        WRFplot(gcm_TOE, wrf_lat, wrf_lon,  amin(gcm_TOE),amax(gcm_TOE), "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        plt.figure(figsize=(7.5,5))
+                        WRFplot(gcm_TOE, wrf_lat, wrf_lon,  2010,2050, "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type ,"TOE in Years", "RdYlBu_r")
                         plt.savefig("GCM TOE Plots"+ "\\" + "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type + ".png")
@@ -149,13 +158,17 @@ def generate_Single_Plots():
                         wrf_lon = wrf_lon[4:-4,4:-4]
                         wrf_lat = wrf_lat[4:-4,4:-4]
                         gcm_TOE = gcm_TOE[4:-4,4:-4]
-                        plt.figure(figsize=(15,10))
-                        WRFplot(wrf_TOE, wrf_lat, wrf_lon,  amin(wrf_TOE),amax(wrf_TOE), "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        
+                        #use a mask on non-signal output TOEs
+                        wrf_TOE = mask(wrf_TOE)
+                        gcm_TOE = mask(gcm_TOE)
+                        plt.figure(figsize=(7.5,5))
+                        WRFplot(wrf_TOE, wrf_lat, wrf_lon,  2010,2300, "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"TOE in Years", "RdYlBu_r")
                         plt.savefig("WRF TOE Plots"+ "\\" + "Time of Emergence for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
-                        plt.figure(figsize=(15,10))
-                        WRFplot(gcm_TOE, wrf_lat, wrf_lon,  amin(gcm_TOE),amax(gcm_TOE), "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        plt.figure(figsize=(7.5,5))
+                        WRFplot(gcm_TOE, wrf_lat, wrf_lon,  2010,2300, "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type ,"TOE in Years", "RdYlBu_r")
                         plt.savefig("GCM TOE Plots"+ "\\" + "Time of Emergence for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type + ".png")

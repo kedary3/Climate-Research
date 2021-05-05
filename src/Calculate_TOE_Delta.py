@@ -127,6 +127,7 @@ def clone(src_file, trg_file): #function to copy attributes, variables, and dime
            
 #     return new_Array
 #define helper delta calculator.
+
 def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     wrf_Data_Type = " "
     if(gcm_Data_Type == "tasmax90"):
@@ -160,21 +161,25 @@ def Calculate_TOE_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     nx = shape(wrf_TOE)[1] # west-east - 162 - wrf / west-east - 33 - gcm
     for k in range(ny):
         for i in range(nx):
-            d = wrf_TOE[[k],[i]]-gcm_TOE[[k],[i]]
+            if(wrf_TOE[[k],[i]] >2299 or gcm_TOE[[k],[i]]> 2299): #signal is non-real
+                d = np.nan
+            else:
+                d = wrf_TOE[[k],[i]]-gcm_TOE[[k],[i]]
             deltas[[k],[i]]=d
     
     wrf_lon=delta_Data.variables["XLONG"][:] 
     wrf_lat=delta_Data.variables["XLAT"][:]
-    plt.figure(figsize=(15,10))
+    plt.figure(figsize=(7.5,5))
     #if the variables are PREC based, then we need to remove border
-    if(gcm_Data_Type == "prx" or gcm_Data_Type == "pr95"): 
-        deltas= deltas[4:-4,4:-4]
-        wrf_lon=wrf_lon[4:-4,4:-4]
-        wrf_lat=wrf_lat[4:-4,4:-4]
-        WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+    
+    deltas= deltas[4:-4,4:-4]
+    wrf_lon=wrf_lon[4:-4,4:-4]
+    wrf_lat=wrf_lat[4:-4,4:-4]
+    if(gcm_Data_Type == "tasmaxx" or gcm_Data_Type == "tasmax90"):
+        WRFplot(deltas, wrf_lat, wrf_lon,  -15,15, "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
     else:
-        WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+        WRFplot(deltas, wrf_lat, wrf_lon,  -200,200, "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in TOE in Years", "RdYlBu_r")
     plt.savefig("ToE Deltas" + "\\" + "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type + ".png")
