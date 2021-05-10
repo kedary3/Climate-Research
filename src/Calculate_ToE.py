@@ -694,8 +694,8 @@ def get_Medain_ToE(file, data_Type):
         print("invalid data type")
         return 1 
     #turn 2d masked array into 1 d array so numpy can sort and find the median
-    array = toe.flatten()
-    print("The median ToE given by " + x[0] + " " + x[1] + " Based On " + data_Type + " is:", np.median(array))
+    ar = toe.flatten()
+    print("The median ToE given by " + x[0] + " " + x[1] + " Based On " + data_Type + " is:", np.median(ar))
     
     data.close()    
     return ((x[0] + " " + x[1]) , (data_Type) , (np.median(array)))
