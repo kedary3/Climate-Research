@@ -161,7 +161,7 @@ def Calculate_Slope_Delta(wrf_File, gcm_File, delta_File, gcm_Data_Type):
     deltas= deltas[4:-4,4:-4]
     wrf_lon=wrf_lon[4:-4,4:-4]
     wrf_lat=wrf_lat[4:-4,4:-4]
-    WRFplot(deltas, wrf_lat, wrf_lon,  amin(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
+    WRFplot(deltas, wrf_lat, wrf_lon,  -1*amax(deltas),amax(deltas), "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
                                       " and " + gcm_File.split("\\")[2].split("_")[0] + "-gcm" + " based on " + gcm_Data_Type ,"Difference in Slope", "RdYlBu_r")
     
     plt.savefig("Slope Deltas" + "\\" + "Delta between "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" +
