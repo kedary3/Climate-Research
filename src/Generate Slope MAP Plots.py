@@ -121,12 +121,12 @@ def generate_Single_Slope_Plots():
                         gcm_Slope = gcm_Slope[4:-4,4:-4]
                        
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(wrf_Slope, wrf_lat, wrf_lon,  -1*amax(wrf_Slope),amax(wrf_Slope), "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        WRFplot(wrf_Slope, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]),amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]), "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"Slope", "RdYlBu_r")
                         plt.savefig("WRF Slope Plots"+ "\\" + "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(gcm_Slope, wrf_lat, wrf_lon,  -1*amax(gcm_Slope),amax(gcm_Slope), "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        WRFplot(gcm_Slope, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]),amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]), "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type ,"Slope", "RdYlBu_r")
                         plt.savefig("GCM Slope Plots"+ "\\" + "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type + ".png")
@@ -155,12 +155,12 @@ def generate_Single_Slope_Plots():
                         wrf_lat = wrf_lat[4:-4,4:-4]
                         gcm_Slope = gcm_Slope[4:-4,4:-4]
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(wrf_Slope, wrf_lat, wrf_lon,  -1*amax(wrf_Slope),amax(wrf_Slope), "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        WRFplot(wrf_Slope, wrf_lat, wrf_lon, -1*amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]),amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]), "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"Slope", "RdYlBu_r")
                         plt.savefig("WRF Slope Plots"+ "\\" + "Slope for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(gcm_Slope, wrf_lat, wrf_lon,  -1*amax(gcm_Slope),amax(gcm_Slope), "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        WRFplot(gcm_Slope, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]),amax([[amax(wrf_Slope)],[amax(gcm_Slope)]]), "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type ,"Slope", "RdYlBu_r")
                         plt.savefig("GCM Slope Plots"+ "\\" + "Slope for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type + ".png")

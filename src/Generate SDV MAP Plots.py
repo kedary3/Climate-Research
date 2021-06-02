@@ -127,12 +127,12 @@ def generate_Single_SDV_Plots():
                         gcm_SDV = gcm_SDV[4:-4,4:-4]
                        
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(wrf_SDV, wrf_lat, wrf_lon,  -1*amax(wrf_SDV),amax(wrf_SDV), "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        WRFplot(wrf_SDV, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]),amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]), "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"SDV", "RdYlBu_r")
                         plt.savefig("WRF SDV Plots"+ "\\" + "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(gcm_SDV, wrf_lat, wrf_lon,  -1*amax(gcm_SDV),amax(gcm_SDV), "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        WRFplot(gcm_SDV, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]),amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]), "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type ,"SDV", "RdYlBu_r")
                         plt.savefig("GCM SDV Plots"+ "\\" + "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + temperature_Type + ".png")
@@ -161,12 +161,12 @@ def generate_Single_SDV_Plots():
                         wrf_lat = wrf_lat[4:-4,4:-4]
                         gcm_SDV = gcm_SDV[4:-4,4:-4]
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(wrf_SDV, wrf_lat, wrf_lon,  -1*amax(wrf_SDV),amax(wrf_SDV), "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
+                        WRFplot(wrf_SDV, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]),amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]), "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type ,"SDV", "RdYlBu_r")
                         plt.savefig("WRF SDV Plots"+ "\\" + "SDV for "  + wrf_File.split("\\")[2].split("-")[0] + "-wrf" 
                                     + " based on " + wrf_Data_Type + ".png")
                         plt.figure(figsize=(7.5,5))
-                        WRFplot(gcm_SDV, wrf_lat, wrf_lon,  -1*amax(gcm_SDV),amax(gcm_SDV), "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
+                        WRFplot(gcm_SDV, wrf_lat, wrf_lon,  -1*amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]),amax([[amax(wrf_SDV)],[amax(gcm_SDV)]]), "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type ,"SDV", "RdYlBu_r")
                         plt.savefig("GCM SDV Plots"+ "\\" + "SDV for "  + gcm_File.split("\\")[2].split("_")[0] + "-gcm" 
                                     + " based on " + precipitation_Type + ".png")
