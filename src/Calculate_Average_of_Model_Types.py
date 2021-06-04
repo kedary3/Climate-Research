@@ -299,7 +299,7 @@ def plot_Averages(avg_File):
         plt.savefig(average_Plots_Folder + "//" + "Average TOE of wrf models based on " + wrf_Data_Type + ".png")
         plt.figure(figsize=(7.5,5))
         WRFplot(avg_GCM_TOE, avg_lat, avg_lon,  2010,2300,
-                "Average TOE of gcm models based on " + wrf_Data_Type,"Time Of Emergence (years)", "RdYlBu_r")
+                "Average TOE of gcm models based on " + gcm_Data_Type,"Time Of Emergence (years)", "RdYlBu_r")
         plt.savefig(average_Plots_Folder + "//" + "Average TOE of gcm models based on " + gcm_Data_Type + ".png")
         
         plt.figure(figsize=(7.5,5))
@@ -390,5 +390,7 @@ gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
 
 
 
-# p
+# Calculate_gcm_Average_TOE_of_Model_Types(avg_File)
+# Calculate_wrf_Average_TOE_of_Model_Types(avg_File)
+# Calculate_Difference_Between_Averages(avg_File)
 plot_Averages(avg_File)

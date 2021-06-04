@@ -287,8 +287,88 @@ def Generate_Three_Pane_TOE_Plots():
 
              new_im.save("Ensemble TOE Plots"+ "\\" + "Ensemble TOE Plot with "+ model + " based on " + precipitation_Type+".png")
     
-        
+def Generate_Three_Pane_Average_Plots(): 
+    t_Data_Types = ["tasmax90"]
+    p_Data_Types = ["pr95"]
+    avg_Folder = r"Average TOE of Models Plots"
+    for temperature_Type in t_Data_Types:
+        Images = []
+        wrf_Data_Type = " "
+        if(temperature_Type == "tasmax90"):
+            wrf_Data_Type = "T2MAX90"
+        elif(temperature_Type == "tasmaxx"):
+            wrf_Data_Type = "T2MAXx"
+        elif(temperature_Type !="tasmax90" and temperature_Type != "tasmaxx"):
+            print("invalid temperature_Type")
+            return 1
+        for WRF_IMG in os.listdir(avg_Folder):
+            WRF_IMG_HEAD , WRF_IMG_TAIL = os.path.split(WRF_IMG)
+            if(WRF_IMG_TAIL.__str__().find(wrf_Data_Type)>=0 and WRF_IMG_TAIL.__str__().find("SDV")==-1):
+                Images.append(Image.open(avg_Folder + "\\"+ WRF_IMG))
+        for GCM_IMG in os.listdir(avg_Folder): 
+            GCM_IMG_HEAD , GCM_IMG_TAIL = os.path.split(GCM_IMG)
+            if(GCM_IMG_TAIL.__str__().find(temperature_Type)>=0 and GCM_IMG_TAIL.__str__().find("SDV")==-1 and GCM_IMG_TAIL.__str__().find("Difference")==-1):
+                Images.append(Image.open(avg_Folder + "\\"+GCM_IMG))
+        for Delta_IMG in os.listdir(avg_Folder): 
+            Delta_IMG_HEAD , Delta_IMG_TAIL = os.path.split(Delta_IMG)
+            if(Delta_IMG_TAIL.__str__().find("Difference")>=0 and Delta_IMG_TAIL.__str__().find(temperature_Type)>=0):
+                Images.append(Image.open(avg_Folder + "\\"+Delta_IMG))
+       
+    
+        widths, heights = zip(*(i.size for i in Images))
+       
+        total_width = sum(widths)
+        max_height = max(heights)
+       
+        new_im = Image.new('RGBA', (total_width, max_height))
+       
+        x_offset = 0
+        for im in Images:
+            new_im.paste(im, (x_offset,0))
+            x_offset += im.size[0]
+    
+        new_im.save("Ensemble Average TOE Plots"+ "\\" + "Ensemble  Average TOE Plot based on " + temperature_Type+".png")
+    for precipitation_Type in p_Data_Types:
+        Images = []
+        wrf_Data_Type = " "
+        if(precipitation_Type == "pr95"):
+            wrf_Data_Type = "PREC95"
+        elif(precipitation_Type == "prx"):
+            wrf_Data_Type = "PRECx"
+        elif(precipitation_Type != "prx" and precipitation_Type != "pr95"):
+            print("invalid precipitation_Type")
+            return 1
+        for WRF_IMG in os.listdir(avg_Folder):
+            WRF_IMG_HEAD , WRF_IMG_TAIL = os.path.split(WRF_IMG)
+            if(WRF_IMG_TAIL.__str__().find(wrf_Data_Type)>=0 and WRF_IMG_TAIL.__str__().find("SDV")==-1):
+                Images.append(Image.open(avg_Folder + "\\"+ WRF_IMG))
+                
+        for GCM_IMG in os.listdir(avg_Folder): 
+            GCM_IMG_HEAD , GCM_IMG_TAIL = os.path.split(GCM_IMG)
+            if(GCM_IMG_TAIL.__str__().find(precipitation_Type)>=0 and GCM_IMG_TAIL.__str__().find("SDV")==-1 and GCM_IMG_TAIL.__str__().find("Difference")==-1):
+                Images.append(Image.open(avg_Folder + "\\"+GCM_IMG))
+                
+        for Delta_IMG in os.listdir(avg_Folder): 
+            Delta_IMG_HEAD , Delta_IMG_TAIL = os.path.split(Delta_IMG)
+            if(Delta_IMG_TAIL.__str__().find("Difference")>=0 and Delta_IMG_TAIL.__str__().find(precipitation_Type)>=0):
+                Images.append(Image.open(avg_Folder + "\\"+Delta_IMG))
+                
+       
+        widths, heights = zip(*(i.size for i in Images))
+       
+        total_width = sum(widths)
+        max_height = max(heights)
+       
+        new_im = Image.new('RGBA', (total_width, max_height))
+       
+        x_offset = 0
+        for im in Images:
+            new_im.paste(im, (x_offset,0))
+            x_offset += im.size[0]
+    
+        new_im.save("Ensemble Average TOE Plots"+ "\\" + "Ensemble  Average TOE Plot based on " + precipitation_Type+".png")
 #execute
-Generate_Three_Pane_TOE_Plots()
-Generate_Three_Pane_SDV_Plots()
-Generate_Three_Pane_Slope_Plots()
+# Generate_Three_Pane_TOE_Plots()
+# Generate_Three_Pane_SDV_Plots()
+# Generate_Three_Pane_Slope_Plots()
+Generate_Three_Pane_Average_Plots()
