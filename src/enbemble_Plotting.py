@@ -368,7 +368,7 @@ def Generate_Three_Pane_Average_Plots():
     
         new_im.save("Ensemble Average TOE Plots"+ "\\" + "Ensemble  Average TOE Plot based on " + precipitation_Type+".png")
 #execute
-# Generate_Three_Pane_TOE_Plots()
-# Generate_Three_Pane_SDV_Plots()
-# Generate_Three_Pane_Slope_Plots()
+Generate_Three_Pane_TOE_Plots()
+Generate_Three_Pane_SDV_Plots()
+Generate_Three_Pane_Slope_Plots()
 Generate_Three_Pane_Average_Plots()
