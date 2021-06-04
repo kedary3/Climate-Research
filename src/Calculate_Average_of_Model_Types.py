@@ -390,7 +390,7 @@ gcm_Folder = r"Netcdf_Files" + "\\" +"gcm_Netcdf_Files"
 
 
 
-# Calculate_gcm_Average_TOE_of_Model_Types(avg_File)
-# Calculate_wrf_Average_TOE_of_Model_Types(avg_File)
-# Calculate_Difference_Between_Averages(avg_File)
+Calculate_gcm_Average_TOE_of_Model_Types(avg_File)
+Calculate_wrf_Average_TOE_of_Model_Types(avg_File)
+Calculate_Difference_Between_Averages(avg_File)
 plot_Averages(avg_File)
